@@ -22,10 +22,10 @@ exports.selectReviews = () => {
         review.comment_count = parseInt(review.comment_count);
       });
       return data.rows;
-
     });
-    
-    exports.selectReview = (review_id) => {
+};
+
+exports.selectReview = (review_id) => {
   return db
     .query(`SELECT * FROM reviews WHERE review_id = $1`, [review_id])
     .then((data) => {
@@ -34,4 +34,5 @@ exports.selectReviews = () => {
       } else {
         return Promise.reject({ msg: "Not Found!", status: 404 });
       }
+    });
 };

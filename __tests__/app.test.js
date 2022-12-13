@@ -9,7 +9,7 @@ afterAll(() => {
   if (db.end) db.end();
 });
 
-describe("1. GET /api/categories", () => {
+describe("3. GET /api/categories", () => {
   test("status:200, responds with an array of objects", () => {
     return request(app)
       .get("/api/categories")
@@ -29,7 +29,7 @@ describe("1. GET /api/categories", () => {
   });
 });
 
-describe("2. GET /api/reviews", () => {
+describe("4. GET /api/reviews", () => {
   test("status:200, responds with an array of objects", () => {
     return request(app)
       .get("/api/reviews")
@@ -63,7 +63,6 @@ describe("5. GET /api/reviews:review_id", () => {
       .expect(200)
       .then(({ body }) => {
         const { review } = body;
-        console.log(review);
         expect(review).toMatchObject({
           review_id: 6,
           title: "Occaecat consequat officia in quis commodo.",
@@ -97,3 +96,4 @@ describe("5. GET /api/reviews:review_id", () => {
         expect(msg).toBe("Not Found!");
       });
   });
+});
