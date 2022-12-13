@@ -106,8 +106,8 @@ describe.only("7. POST /api/reviews/:review_id/comments", () => {
     };
     return request(app)
       .post("/api/reviews/13/comments")
-      .expect(201)
       .send(newComment)
+      .expect(201)
       .then(({ body }) => {
         const { comment } = body;
         expect(comment.body).toBe(newComment.body),
@@ -120,4 +120,45 @@ describe.only("7. POST /api/reviews/:review_id/comments", () => {
         }));
       });
   });
+  test("status:400, post body missing required fields", ()=> {
+    const newComment = {
+      body: "good game"
+    }
+    return request(app)
+    .post("/api/reviews/5/comments")
+    .send(newComment)
+    .expect(400)
+    .then((res)=>{
+      const msg = res.body.msg
+      expect(msg).toBe("Very Bad Request!")
+    })
+  })
+  test("status:400, post body with non-existent username", ()=> {
+    const newComment = {
+      username: "kontsio",
+      body: "good game"
+    }
+    return request(app)
+    .post("/api/reviews/5/comments")
+    .send(newComment)
+    .expect(400)
+    .then((res)=>{
+      const msg = res.body.msg
+      expect(msg).toBe("Very Bad Request!")
+    })
+  })
+  test("status:400, post body with non-existent review_id", ()=> {
+    const newComment = {
+      username: "dav3rid",
+      body: "good game"
+    }
+    return request(app)
+    .post("/api/reviews/115/comments")
+    .send(newComment)
+    .expect(400)
+    .then((res)=>{
+      const msg = res.body.msg
+      expect(msg).toBe("Very Bad Request!")
+    })
+  })
 });
