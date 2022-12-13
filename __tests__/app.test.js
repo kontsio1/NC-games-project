@@ -78,4 +78,5 @@ describe.only("6. GET /api/comments/:review_id/comments", ()=>{
       });
     });
   })
+  test("status: 404")
 })
