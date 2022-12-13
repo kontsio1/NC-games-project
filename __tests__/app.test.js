@@ -3,6 +3,7 @@ const app = require("../app");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
+const { get } = require("../app");
 beforeEach(() => seed(testData));
 
 afterAll(() => {
@@ -29,15 +30,15 @@ describe("1. GET /api/categories", () => {
   });
 });
 
-describe("2. GET /api/reviews", () => {
+describe("2. GET /api/comments", () => {
   test("status:200, responds with an array of objects", () => {
     return request(app)
-      .get("/api/reviews")
+      .get("/api/comments")
       .expect(200)
       .then(({ body }) => {
-        const { reviews } = body;
-        expect(reviews).toHaveLength(13);
-        reviews.forEach((review) => {
+        const { comments } = body;
+        expect(comments).toHaveLength(13);
+        comments.forEach((review) => {
           expect(review).toEqual(
             expect.objectContaining({
               owner: expect.any(String),
@@ -55,3 +56,26 @@ describe("2. GET /api/reviews", () => {
       });
   });
 });
+
+describe.only("6. GET /api/comments/:review_id/comments", ()=>{
+  test("status:200, responds with an array of objects", ()=>{
+    return request(app)
+    .get("/api/reviews/3/comments")
+    .expect(200)
+    .then(({ body }) => {
+      const { comments } = body;
+      comments.forEach((comment) => {
+        expect(comment).toEqual(
+          expect.objectContaining({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            review_id: expect.any(Number),
+            author: expect.any(String),
+            body: expect.any(String)
+          })
+        );
+      });
+    });
+  })
+})
