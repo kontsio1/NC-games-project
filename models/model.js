@@ -1,5 +1,4 @@
 const db = require("../db/connection");
-const { commentData } = require("../db/data/test-data");
 
 exports.selectCategories = () => {
   return db.query(`SELECT * FROM categories`).then((data) => {
@@ -26,13 +25,27 @@ exports.selectReviews = () => {
 };
 
 exports.selectComments = (review_id) => {
-  return db
-  .query(`SELECT * FROM comments WHERE review_id = $1 ORDER BY created_at DESC`, [review_id])
-  .then((data) => {
-    if (data.rows.length !== 0) {
-      return data.rows;
-    } else {
-        return Promise.reject({ msg: "Not Valid Review Id", status: 404 });
+  return (commentsPromise = db
+    .query(
+      `SELECT * FROM comments WHERE review_id = $1 ORDER BY created_at DESC;`,
+      [review_id]
+    )
+    .then((data) => {
+      if (data.rows.length !== 0) {
+        return data.rows;
+      } else {
+        return db
+          .query(`SELECT * FROM reviews WHERE review_id = $1`, [review_id])
+          .then((data) => {
+            if (data.rows.length === 0) {
+              return Promise.reject({
+                msg: "Not Valid Review Id",
+                status: 404,
+              });
+            } else {
+              return []
+            }
+          });
       }
-    });
+    }));
 };

@@ -64,6 +64,7 @@ describe("6. GET /api/comments/:review_id/comments", ()=>{
     .expect(200)
     .then(({ body }) => {
       const { comments } = body;
+      expect(comments).toBeSortedBy('created_at', {descending: true})
       comments.forEach((comment) => {
         expect(comment).toEqual(
           expect.objectContaining({
@@ -78,6 +79,15 @@ describe("6. GET /api/comments/:review_id/comments", ()=>{
       });
     });
   })
+  test("status:200, responds with an empty array when there are no comments", () => {
+    return request(app)
+      .get("/api/reviews/5/comments")
+      .expect(200)
+      .then(({body}) => {
+        const {comments} = body;
+        expect(comments).toEqual([])
+      });
+  });
   test("status:400, review_id is not a number", () => {
     return request(app)
       .get("/api/reviews/EhWhatWasThatIdAgain/comments")
@@ -89,7 +99,7 @@ describe("6. GET /api/comments/:review_id/comments", ()=>{
   });
   test("status:404, review_id is a non-valid number", () => {
     return request(app)
-      .get("/api/reviews/1445/comments")
+      .get("/api/reviews/1453/comments")
       .expect(404)
       .then((res) => {
         const msg = res.body.msg;
