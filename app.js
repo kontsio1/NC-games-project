@@ -21,8 +21,10 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  if (err.msg !== undefined) {
+    if (err.msg !== undefined) {
     res.status(err.status).send({ msg: err.msg });
+  } else {
+    next(err)
   }
 });
 
