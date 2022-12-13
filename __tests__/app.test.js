@@ -37,7 +37,6 @@ describe("2. GET /api/reviews", () => {
       .then(({ body }) => {
         const { reviews } = body;
         expect(reviews).toHaveLength(13);
-        // expect(reviews).toBeSortedBy("created_at", { descending: true })
         reviews.forEach((review) => {
           expect(review).toEqual(
             expect.objectContaining({
