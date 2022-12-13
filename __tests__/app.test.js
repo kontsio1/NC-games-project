@@ -29,6 +29,33 @@ describe("1. GET /api/categories", () => {
   });
 });
 
+describe("2. GET /api/reviews", () => {
+  test("status:200, responds with an array of objects", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toHaveLength(13);
+        reviews.forEach((review) => {
+          expect(review).toEqual(
+            expect.objectContaining({
+              owner: expect.any(String),
+              title: expect.any(String),
+              review_id: expect.any(Number),
+              category: expect.any(String),
+              review_img_url: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              designer: expect.any(String),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+});
+
 describe("5. GET /api/reviews:review_id", () => {
   test("status:200, responds with an array of objects", () => {
     return request(app)
@@ -70,4 +97,3 @@ describe("5. GET /api/reviews:review_id", () => {
         expect(msg).toBe("Not Found!");
       });
   });
-});

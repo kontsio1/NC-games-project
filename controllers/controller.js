@@ -1,10 +1,16 @@
-const { selectCategories, selectReview } = require("../models/model");
+const { selectCategories, selectReviews, selectReview } = require("../models/model");
 
 exports.getCategories = (req, res, next) => {
   selectCategories().then((categories) => {
     res.status(200).send({categories});
   });
 };
+
+exports.getReviews = (req, res, next) => {
+    selectReviews().then((reviews)=>{
+        res.status(200).send({reviews})
+    })
+}
 
 exports.getReview = (req, res, next) => {
   const {review_id} = req.params
@@ -14,4 +20,3 @@ exports.getReview = (req, res, next) => {
   .catch((err) => {
     next(err);
 })
-}
