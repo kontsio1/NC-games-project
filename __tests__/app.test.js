@@ -56,7 +56,7 @@ describe("4. GET /api/reviews", () => {
   });
 });
 
-describe("5. GET /api/reviews:review_id", () => {
+describe("5. GET /api/reviews/:review_id", () => {
   test("status:200, responds with an array of objects", () => {
     return request(app)
       .get("/api/reviews/6")
@@ -94,6 +94,30 @@ describe("5. GET /api/reviews:review_id", () => {
       .then((res) => {
         const msg = res.body.msg;
         expect(msg).toBe("Not Found!");
+      });
+  });
+});
+
+describe.only("7. POST /api/reviews/:review_id/comments", () => {
+  test("status:200, responds with the posted comment object", () => {
+    const newComment = {
+      username: "dav3rid",
+      body: "Absulutely amazing gamme, would definetely recommend",
+    };
+    return request(app)
+      .post("/api/reviews/13/comments")
+      .expect(201)
+      .send(newComment)
+      .then(({ body }) => {
+        const { comment } = body;
+        expect(comment.body).toBe(newComment.body),
+        expect(comment.author).toBe(newComment.username),
+        expect(comment.review_id).toBe(13)
+        expect(comment).toEqual(expect.objectContaining({
+          comment_id: expect.any(Number),
+          votes: expect.any(Number),
+          created_at: expect.any(String),
+        }));
       });
   });
 });
