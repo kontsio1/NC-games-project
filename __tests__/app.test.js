@@ -57,7 +57,7 @@ describe("4. GET /api/reviews", () => {
   });
 });
 
-describe("5. GET /api/reviews:review_id", () => {
+describe("5. GET /api/reviews/:review_id", () => {
   test("status:200, responds with an array of objects", () => {
     return request(app)
       .get("/api/reviews/6")
@@ -149,3 +149,82 @@ describe("6. GET /api/comments/:review_id/comments", ()=>{
       });
   });
 })
+
+describe("7. POST /api/reviews/:review_id/comments", () => {
+  test("status:201, responds with the posted comment object", () => {
+    const newComment = {
+      username: "dav3rid",
+      body: "Absulutely amazing gamme, would definetely recommend",
+    };
+    return request(app)
+      .post("/api/reviews/13/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({ body }) => {
+        const { comment } = body;
+        expect(comment.body).toBe(newComment.body),
+        expect(comment.author).toBe(newComment.username),
+        expect(comment.review_id).toBe(13)
+        expect(comment).toEqual(expect.objectContaining({
+          comment_id: expect.any(Number),
+          votes: expect.any(Number),
+          created_at: expect.any(String),
+        }));
+      });
+  });
+  test("status:400, post body missing required fields", ()=> {
+    const newComment = {
+      body: "good game"
+    }
+    return request(app)
+    .post("/api/reviews/5/comments")
+    .send(newComment)
+    .expect(400)
+    .then((res)=>{
+      const msg = res.body.msg
+      expect(msg).toBe("Very Bad Request!")
+    })
+  })
+  test("status:404, post body with non-existent username", ()=> {
+    const newComment = {
+      username: "kontsio",
+      body: "good game"
+    }
+    return request(app)
+    .post("/api/reviews/5/comments")
+    .send(newComment)
+    .expect(404)
+    .then((res)=>{
+      const msg = res.body.msg
+      expect(msg).toBe("Not found!")
+    })
+  })
+  test("status:404, post body with non-existent review_id", ()=> {
+    const newComment = {
+      username: "dav3rid",
+      body: "good game"
+    }
+    return request(app)
+    .post("/api/reviews/115/comments")
+    .send(newComment)
+    .expect(404)
+    .then((res)=>{
+      const msg = res.body.msg
+      expect(msg).toBe("Not found!")
+    })
+  })
+  test("status:400, post body with an invalid review_id", ()=> {
+    const newComment = {
+      username: "dav3rid",
+      body: "good game"
+    }
+    return request(app)
+    .post("/api/reviews/banana/comments")
+    .send(newComment)
+    .expect(400)
+    .then((res)=>{
+      const msg = res.body.msg
+      expect(msg).toBe("Very Bad Request!")
+    })
+  })
+});
