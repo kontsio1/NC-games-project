@@ -3,6 +3,7 @@ const app = require("../app");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
+const { get } = require("../app");
 beforeEach(() => seed(testData));
 
 afterAll(() => {
@@ -97,6 +98,57 @@ describe("5. GET /api/reviews/:review_id", () => {
       });
   });
 });
+
+describe("6. GET /api/comments/:review_id/comments", ()=>{
+  test("status:200, responds with an array of objects", ()=>{
+    return request(app)
+    .get("/api/reviews/3/comments")
+    .expect(200)
+    .then(({ body }) => {
+      const { comments } = body;
+      expect(comments).toBeSortedBy('created_at', {descending: true})
+      comments.forEach((comment) => {
+        expect(comment).toEqual(
+          expect.objectContaining({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            review_id: expect.any(Number),
+            author: expect.any(String),
+            body: expect.any(String)
+          })
+        );
+      });
+    });
+  })
+  test("status:200, responds with an empty array when there are no comments", () => {
+    return request(app)
+      .get("/api/reviews/5/comments")
+      .expect(200)
+      .then(({body}) => {
+        const {comments} = body;
+        expect(comments).toEqual([])
+      });
+  });
+  test("status:400, review_id is not a number", () => {
+    return request(app)
+      .get("/api/reviews/EhWhatWasThatIdAgain/comments")
+      .expect(400)
+      .then((res) => {
+        const msg = res.body.msg;
+        expect(msg).toBe("Very Bad Request!");
+      });
+  });
+  test("status:404, review_id is a non-valid number", () => {
+    return request(app)
+      .get("/api/reviews/1453/comments")
+      .expect(404)
+      .then((res) => {
+        const msg = res.body.msg;
+        expect(msg).toBe("Not Valid Review Id");
+      });
+  });
+})
 
 describe("7. POST /api/reviews/:review_id/comments", () => {
   test("status:201, responds with the posted comment object", () => {
