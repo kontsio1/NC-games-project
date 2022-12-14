@@ -98,8 +98,8 @@ describe("5. GET /api/reviews/:review_id", () => {
   });
 });
 
-describe.only("7. POST /api/reviews/:review_id/comments", () => {
-  test("status:200, responds with the posted comment object", () => {
+describe("7. POST /api/reviews/:review_id/comments", () => {
+  test("status:201, responds with the posted comment object", () => {
     const newComment = {
       username: "dav3rid",
       body: "Absulutely amazing gamme, would definetely recommend",
@@ -133,7 +133,7 @@ describe.only("7. POST /api/reviews/:review_id/comments", () => {
       expect(msg).toBe("Very Bad Request!")
     })
   })
-  test("status:400, post body with non-existent username", ()=> {
+  test("status:404, post body with non-existent username", ()=> {
     const newComment = {
       username: "kontsio",
       body: "good game"
@@ -141,19 +141,33 @@ describe.only("7. POST /api/reviews/:review_id/comments", () => {
     return request(app)
     .post("/api/reviews/5/comments")
     .send(newComment)
-    .expect(400)
+    .expect(404)
     .then((res)=>{
       const msg = res.body.msg
-      expect(msg).toBe("Very Bad Request!")
+      expect(msg).toBe("Not found!")
     })
   })
-  test("status:400, post body with non-existent review_id", ()=> {
+  test("status:404, post body with non-existent review_id", ()=> {
     const newComment = {
       username: "dav3rid",
       body: "good game"
     }
     return request(app)
     .post("/api/reviews/115/comments")
+    .send(newComment)
+    .expect(404)
+    .then((res)=>{
+      const msg = res.body.msg
+      expect(msg).toBe("Not found!")
+    })
+  })
+  test("status:400, post body with an invalid review_id", ()=> {
+    const newComment = {
+      username: "dav3rid",
+      body: "good game"
+    }
+    return request(app)
+    .post("/api/reviews/banana/comments")
     .send(newComment)
     .expect(400)
     .then((res)=>{
