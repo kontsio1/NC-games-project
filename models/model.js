@@ -43,12 +43,12 @@ exports.selectComments = (review_id) => {
                 status: 404,
               });
             } else {
-              return []
+              return [];
             }
           });
       }
     }));
-    }
+};
 
 exports.selectReview = (review_id) => {
   return db
@@ -63,7 +63,28 @@ exports.selectReview = (review_id) => {
 };
 
 exports.insertComment = (review_id, author, body) => {
-  return db.query(`INSERT INTO comments (author, review_id, body) VALUES ($1, $2, $3) RETURNING *`, [author, review_id, body]).then((data)=>{
-    return data.rows
-  })
+  return db
+    .query(
+      `INSERT INTO comments (author, review_id, body) VALUES ($1, $2, $3) RETURNING *`,
+      [author, review_id, body]
+    )
+    .then((data) => {
+      return data.rows;
+    });
+};
+
+exports.updateReview = (review_id, patchObject) => {
+  if (Object.keys(patchObject).length === 1) {
+    const { inc_votes } = patchObject;
+    return db
+      .query(
+        `UPDATE reviews SET votes = votes + $1 WHERE review_id=$2 RETURNING * ;`,
+        [inc_votes, review_id]
+      )
+      .then((data) => {
+        return data.rows;
+      });
+  } else {
+    return Promise.reject({status: 400, msg:'Very Bad Request!'})
+  }
 };
