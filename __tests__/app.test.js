@@ -311,4 +311,26 @@ describe("8. PATCH /api/reviews/:review_id", () => {
       expect(msg).toBe("Very Bad Request!")
     })
   });
+  test("status:400 invalid review_id", () => {
+    const patchedVotes = {inc_votes: 2};
+    return request(app)
+    .patch("/api/reviews/bananas")
+    .send(patchedVotes)
+    .expect(400)
+    .then((res)=>{
+      const msg = res.body.msg
+      expect(msg).toBe("Very Bad Request!")
+    })
+  });
+  test("status:400 review_id is valid but does not exist", () => {
+    const patchedVotes = {inc_votes: 2};
+    return request(app)
+    .patch("/api/reviews/112")
+    .send(patchedVotes)
+    .expect(404)
+    .then((res)=>{
+      const msg = res.body.msg
+      expect(msg).toBe("Not Found!")
+    })
+  });
 });

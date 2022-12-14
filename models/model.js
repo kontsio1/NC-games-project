@@ -82,9 +82,13 @@ exports.updateReview = (review_id, patchObject) => {
         [inc_votes, review_id]
       )
       .then((data) => {
-        return data.rows;
+        if (data.rows.length === 0) {
+          return Promise.reject({status:404, msg:"Not Found!"})
+        } else {
+          return data.rows;
+        }
       });
   } else {
-    return Promise.reject({status: 400, msg:'Very Bad Request!'})
+    return Promise.reject({ status: 400, msg: "Very Bad Request!" });
   }
 };
