@@ -281,56 +281,75 @@ describe("8. PATCH /api/reviews/:review_id", () => {
   test("status:400 patch body missing required fields", () => {
     const patchedVotes = {};
     return request(app)
-    .patch("/api/reviews/7")
-    .send(patchedVotes)
-    .expect(400)
-    .then((res)=>{
-      const msg = res.body.msg
-      expect(msg).toBe("Very Bad Request!")
-    })
+      .patch("/api/reviews/7")
+      .send(patchedVotes)
+      .expect(400)
+      .then((res) => {
+        const msg = res.body.msg;
+        expect(msg).toBe("Very Bad Request!");
+      });
   });
   test("status:400 patch body invalid inc_votes increment", () => {
-    const patchedVotes = {inc_votes: "It's snowing!"};
+    const patchedVotes = { inc_votes: "It's snowing!" };
     return request(app)
-    .patch("/api/reviews/7")
-    .send(patchedVotes)
-    .expect(400)
-    .then((res)=>{
-      const msg = res.body.msg
-      expect(msg).toBe("Very Bad Request!")
-    })
+      .patch("/api/reviews/7")
+      .send(patchedVotes)
+      .expect(400)
+      .then((res) => {
+        const msg = res.body.msg;
+        expect(msg).toBe("Very Bad Request!");
+      });
   });
   test("status:400 patch body includes invalid fields", () => {
-    const patchedVotes = {inc_votes: 4, bestProgrammerAround: 'me'};
+    const patchedVotes = { inc_votes: 4, bestProgrammerAround: "me" };
     return request(app)
-    .patch("/api/reviews/7")
-    .send(patchedVotes)
-    .expect(400)
-    .then((res)=>{
-      const msg = res.body.msg
-      expect(msg).toBe("Very Bad Request!")
-    })
+      .patch("/api/reviews/7")
+      .send(patchedVotes)
+      .expect(400)
+      .then((res) => {
+        const msg = res.body.msg;
+        expect(msg).toBe("Very Bad Request!");
+      });
   });
   test("status:400 invalid review_id", () => {
-    const patchedVotes = {inc_votes: 2};
+    const patchedVotes = { inc_votes: 2 };
     return request(app)
-    .patch("/api/reviews/bananas")
-    .send(patchedVotes)
-    .expect(400)
-    .then((res)=>{
-      const msg = res.body.msg
-      expect(msg).toBe("Very Bad Request!")
-    })
+      .patch("/api/reviews/bananas")
+      .send(patchedVotes)
+      .expect(400)
+      .then((res) => {
+        const msg = res.body.msg;
+        expect(msg).toBe("Very Bad Request!");
+      });
   });
   test("status:400 review_id is valid but does not exist", () => {
-    const patchedVotes = {inc_votes: 2};
+    const patchedVotes = { inc_votes: 2 };
     return request(app)
-    .patch("/api/reviews/112")
-    .send(patchedVotes)
-    .expect(404)
-    .then((res)=>{
-      const msg = res.body.msg
-      expect(msg).toBe("Not Found!")
-    })
+      .patch("/api/reviews/112")
+      .send(patchedVotes)
+      .expect(404)
+      .then((res) => {
+        const msg = res.body.msg;
+        expect(msg).toBe("Not Found!");
+      });
+  });
+});
+describe.only("9. GET /api/users", () => {
+  test("status:200, responds with an array of objects", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body;
+        users.forEach((user) => {
+          expect(user).toEqual(
+            expect.objectContaining({
+              username: expect.any(String),
+              name: expect.any(String),
+              avatar_url: expect.any(String)
+            })
+          )
+        });
+      });
   });
 });

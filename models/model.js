@@ -92,3 +92,10 @@ exports.updateReview = (review_id, patchObject) => {
     return Promise.reject({ status: 400, msg: "Very Bad Request!" });
   }
 };
+
+exports.selectUsers = () => {
+  return db.query('SELECT * FROM users').then((data)=>{
+    // console.log(data.rows)
+    return data.rows
+  })
+}
