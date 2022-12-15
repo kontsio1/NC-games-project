@@ -99,35 +99,35 @@ describe("5. GET /api/reviews/:review_id", () => {
   });
 });
 
-describe("6. GET /api/comments/:review_id/comments", ()=>{
-  test("status:200, responds with an array of objects", ()=>{
+describe("6. GET /api/comments/:review_id/comments", () => {
+  test("status:200, responds with an array of objects", () => {
     return request(app)
-    .get("/api/reviews/3/comments")
-    .expect(200)
-    .then(({ body }) => {
-      const { comments } = body;
-      expect(comments).toBeSortedBy('created_at', {descending: true})
-      comments.forEach((comment) => {
-        expect(comment).toEqual(
-          expect.objectContaining({
-            comment_id: expect.any(Number),
-            votes: expect.any(Number),
-            created_at: expect.any(String),
-            review_id: expect.any(Number),
-            author: expect.any(String),
-            body: expect.any(String)
-          })
-        );
+      .get("/api/reviews/3/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments).toBeSortedBy("created_at", { descending: true });
+        comments.forEach((comment) => {
+          expect(comment).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+              review_id: expect.any(Number),
+              author: expect.any(String),
+              body: expect.any(String),
+            })
+          );
+        });
       });
-    });
-  })
+  });
   test("status:200, responds with an empty array when there are no comments", () => {
     return request(app)
       .get("/api/reviews/5/comments")
       .expect(200)
-      .then(({body}) => {
-        const {comments} = body;
-        expect(comments).toEqual([])
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments).toEqual([]);
       });
   });
   test("status:400, review_id is not a number", () => {
@@ -148,7 +148,7 @@ describe("6. GET /api/comments/:review_id/comments", ()=>{
         expect(msg).toBe("Not Valid Review Id");
       });
   });
-})
+});
 
 describe("7. POST /api/reviews/:review_id/comments", () => {
   test("status:201, responds with the posted comment object", () => {
@@ -163,68 +163,186 @@ describe("7. POST /api/reviews/:review_id/comments", () => {
       .then(({ body }) => {
         const { comment } = body;
         expect(comment.body).toBe(newComment.body),
-        expect(comment.author).toBe(newComment.username),
-        expect(comment.review_id).toBe(13)
-        expect(comment).toEqual(expect.objectContaining({
-          comment_id: expect.any(Number),
-          votes: expect.any(Number),
-          created_at: expect.any(String),
-        }));
+          expect(comment.author).toBe(newComment.username),
+          expect(comment.review_id).toBe(13);
+        expect(comment).toEqual(
+          expect.objectContaining({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+          })
+        );
       });
   });
-  test("status:400, post body missing required fields", ()=> {
+  test("status:400, post body missing required fields", () => {
     const newComment = {
-      body: "good game"
-    }
+      body: "good game",
+    };
     return request(app)
-    .post("/api/reviews/5/comments")
-    .send(newComment)
-    .expect(400)
-    .then((res)=>{
-      const msg = res.body.msg
-      expect(msg).toBe("Very Bad Request!")
-    })
-  })
-  test("status:404, post body with non-existent username", ()=> {
+      .post("/api/reviews/5/comments")
+      .send(newComment)
+      .expect(400)
+      .then((res) => {
+        const msg = res.body.msg;
+        expect(msg).toBe("Very Bad Request!");
+      });
+  });
+  test("status:404, post body with non-existent username", () => {
     const newComment = {
       username: "kontsio",
-      body: "good game"
-    }
+      body: "good game",
+    };
     return request(app)
-    .post("/api/reviews/5/comments")
-    .send(newComment)
-    .expect(404)
-    .then((res)=>{
-      const msg = res.body.msg
-      expect(msg).toBe("Not found!")
-    })
-  })
-  test("status:404, post body with non-existent review_id", ()=> {
+      .post("/api/reviews/5/comments")
+      .send(newComment)
+      .expect(404)
+      .then((res) => {
+        const msg = res.body.msg;
+        expect(msg).toBe("Not found!");
+      });
+  });
+  test("status:404, post body with non-existent review_id", () => {
     const newComment = {
       username: "dav3rid",
-      body: "good game"
-    }
+      body: "good game",
+    };
     return request(app)
-    .post("/api/reviews/115/comments")
-    .send(newComment)
-    .expect(404)
-    .then((res)=>{
-      const msg = res.body.msg
-      expect(msg).toBe("Not found!")
-    })
-  })
-  test("status:400, post body with an invalid review_id", ()=> {
+      .post("/api/reviews/115/comments")
+      .send(newComment)
+      .expect(404)
+      .then((res) => {
+        const msg = res.body.msg;
+        expect(msg).toBe("Not found!");
+      });
+  });
+  test("status:400, post body with an invalid review_id", () => {
     const newComment = {
       username: "dav3rid",
-      body: "good game"
-    }
+      body: "good game",
+    };
     return request(app)
-    .post("/api/reviews/banana/comments")
-    .send(newComment)
+      .post("/api/reviews/banana/comments")
+      .send(newComment)
+      .expect(400)
+      .then((res) => {
+        const msg = res.body.msg;
+        expect(msg).toBe("Very Bad Request!");
+      });
+  });
+});
+
+describe("8. PATCH /api/reviews/:review_id", () => {
+  test("status:200, responds with the amended review object - positive increment", () => {
+    const patchedVotes = { inc_votes: 1 };
+    return request(app)
+      .patch("/api/reviews/7")
+      .send(patchedVotes)
+      .expect(200)
+      .then(({ body }) => {
+        const { review } = body;
+        expect(review).toMatchObject({
+          review_id: 7,
+          title: "Mollit elit qui incididunt veniam occaecat cupidatat",
+          category: "social deduction",
+          designer: "Avery Wunzboogerz",
+          owner: "mallionaire",
+          review_body:
+            "Consectetur incididunt aliquip sunt officia. Magna ex nulla consectetur laboris incididunt ea non qui. Enim id eiusmod irure dolor ipsum in tempor consequat amet ullamco. Occaecat fugiat sint fugiat mollit consequat pariatur consequat non exercitation dolore. Labore occaecat in magna commodo anim enim eiusmod eu pariatur ad duis magna. Voluptate ad et dolore ullamco anim sunt do. Qui exercitation tempor in in minim ullamco fugiat ipsum. Duis irure voluptate cupidatat do id mollit veniam culpa. Velit deserunt exercitation amet laborum nostrud dolore in occaecat minim amet nostrud sunt in. Veniam ut aliqua incididunt commodo sint in anim duis id commodo voluptate sit quis.",
+          review_img_url:
+            "https://images.pexels.com/photos/278888/pexels-photo-278888.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+          created_at: "2021-01-25T09:16:54.963Z",
+          votes: 10,
+        });
+      });
+  });
+  test("status:200, responds with the amended review object - negative increment", () => {
+    const patchedVotes = { inc_votes: -3 };
+    return request(app)
+      .patch("/api/reviews/7")
+      .send(patchedVotes)
+      .expect(200)
+      .then(({ body }) => {
+        const { review } = body;
+        expect(review).toMatchObject({
+          review_id: 7,
+          title: "Mollit elit qui incididunt veniam occaecat cupidatat",
+          category: "social deduction",
+          designer: "Avery Wunzboogerz",
+          owner: "mallionaire",
+          review_body:
+            "Consectetur incididunt aliquip sunt officia. Magna ex nulla consectetur laboris incididunt ea non qui. Enim id eiusmod irure dolor ipsum in tempor consequat amet ullamco. Occaecat fugiat sint fugiat mollit consequat pariatur consequat non exercitation dolore. Labore occaecat in magna commodo anim enim eiusmod eu pariatur ad duis magna. Voluptate ad et dolore ullamco anim sunt do. Qui exercitation tempor in in minim ullamco fugiat ipsum. Duis irure voluptate cupidatat do id mollit veniam culpa. Velit deserunt exercitation amet laborum nostrud dolore in occaecat minim amet nostrud sunt in. Veniam ut aliqua incididunt commodo sint in anim duis id commodo voluptate sit quis.",
+          review_img_url:
+            "https://images.pexels.com/photos/278888/pexels-photo-278888.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+          created_at: "2021-01-25T09:16:54.963Z",
+          votes: 6,
+        });
+      });
+  });
+  test("status:200 patch body includes invalid fields", () => {
+    const patchedVotes = {inc_votes: 4, bestProgrammerAround: 'me'};
+    return request(app)
+    .patch("/api/reviews/7")
+    .send(patchedVotes)
+    .expect(200)
+    .then(({ body }) => {
+      const { review } = body;
+      expect(review).toMatchObject({
+        review_id: 7,
+        title: "Mollit elit qui incididunt veniam occaecat cupidatat",
+        category: "social deduction",
+        designer: "Avery Wunzboogerz",
+        owner: "mallionaire",
+        review_body:
+          "Consectetur incididunt aliquip sunt officia. Magna ex nulla consectetur laboris incididunt ea non qui. Enim id eiusmod irure dolor ipsum in tempor consequat amet ullamco. Occaecat fugiat sint fugiat mollit consequat pariatur consequat non exercitation dolore. Labore occaecat in magna commodo anim enim eiusmod eu pariatur ad duis magna. Voluptate ad et dolore ullamco anim sunt do. Qui exercitation tempor in in minim ullamco fugiat ipsum. Duis irure voluptate cupidatat do id mollit veniam culpa. Velit deserunt exercitation amet laborum nostrud dolore in occaecat minim amet nostrud sunt in. Veniam ut aliqua incididunt commodo sint in anim duis id commodo voluptate sit quis.",
+        review_img_url:
+          "https://images.pexels.com/photos/278888/pexels-photo-278888.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+        created_at: "2021-01-25T09:16:54.963Z",
+        votes: 13,
+      });
+    });
+  });
+  test("status:400 patch body missing required fields", () => {
+    const patchedVotes = {};
+    return request(app)
+    .patch("/api/reviews/7")
+    .send(patchedVotes)
     .expect(400)
     .then((res)=>{
       const msg = res.body.msg
       expect(msg).toBe("Very Bad Request!")
     })
-  })
+  });
+  test("status:400 patch body invalid inc_votes increment", () => {
+    const patchedVotes = {inc_votes: "It's snowing!"};
+    return request(app)
+    .patch("/api/reviews/7")
+    .send(patchedVotes)
+    .expect(400)
+    .then((res)=>{
+      const msg = res.body.msg
+      expect(msg).toBe("Very Bad Request!")
+    })
+  });
+  test("status:400 invalid review_id", () => {
+    const patchedVotes = {inc_votes: 2};
+    return request(app)
+    .patch("/api/reviews/bananas")
+    .send(patchedVotes)
+    .expect(400)
+    .then((res)=>{
+      const msg = res.body.msg
+      expect(msg).toBe("Very Bad Request!")
+    })
+  });
+  test("status:400 review_id is valid but does not exist", () => {
+    const patchedVotes = {inc_votes: 2};
+    return request(app)
+    .patch("/api/reviews/112")
+    .send(patchedVotes)
+    .expect(404)
+    .then((res)=>{
+      const msg = res.body.msg
+      expect(msg).toBe("Not Found!")
+    })
+  });
 });
