@@ -74,7 +74,6 @@ exports.insertComment = (review_id, author, body) => {
 };
 
 exports.updateReview = (review_id, patchObject) => {
-  // if (Object.keys(patchObject).length === 1) {
     const { inc_votes } = patchObject;
     return db
       .query(
@@ -88,7 +87,21 @@ exports.updateReview = (review_id, patchObject) => {
           return data.rows;
         }
       });
-  // } else {
-    // return Promise.reject({ status: 400, msg: "Very Bad Request!" });
-  // }
 };
+exports.selectReviewsByCategory = (category) => {
+  return db.query(`SELECT * FROM reviews WHERE category = $1;`,[category]).then((data)=>{
+    return data.rows
+  })
+}
+
+exports.sortReviewsByColumn = (column) => {
+  if(column === "") column = 'created_at'
+  validColumns = ['review_id','title','category','designer','owner','review_body','review_img_url','created_at','votes']
+  if (validColumns.includes(column)) {
+  return db.query(`SELECT * FROM reviews ORDER BY ${column} ASC;`).then((data)=>{
+    return data.rows
+  })
+} else {
+  return Promise.reject({status:400, msg:"Very Bad Request!"})
+}
+}

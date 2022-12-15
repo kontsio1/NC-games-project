@@ -4,7 +4,9 @@ const {
   selectReview,
   insertComment,
   selectComments,
-  updateReview
+  updateReview,
+  selectReviewsByCategory,
+  sortReviewsByColumn,
 } = require("../models/model");
 
 exports.getCategories = (req, res, next) => {
@@ -14,9 +16,34 @@ exports.getCategories = (req, res, next) => {
 };
 
 exports.getReviews = (req, res, next) => {
-  selectReviews().then((reviews) => {
-    res.status(200).send({ reviews });
-  });
+  const validQueries = ["category", "sort_by", "order"];
+  const query = Object.keys(req.query)[0];
+  if (query === undefined) {
+    selectReviews().then((reviews) => {
+      res.status(200).send({ reviews })
+    }).catch((err) => {
+      next(err);
+    });
+  } else {
+    const validQueryIndex = validQueries.indexOf(query);
+    if (validQueryIndex === 0) {
+      const selectedCategory = req.query.category;
+      selectReviewsByCategory(selectedCategory).then((reviews) => {
+        res.status(200).send({ reviews })
+      }).catch((err) => {
+        next(err);
+      });
+    } else if (validQueryIndex === 1) {
+      const sortColumn = req.query.sort_by;
+      sortReviewsByColumn(sortColumn).then((reviews)=>{
+        res.status(200).send({ reviews })
+      }).catch((err) => {
+        next(err);
+      });
+    } else {
+      res.status(400).send({ msg: "Very Bad Request!" });
+    }
+  }
 };
 
 exports.getReview = (req, res, next) => {
@@ -25,39 +52,42 @@ exports.getReview = (req, res, next) => {
     .then(([review]) => {
       res.status(200).send({ review });
     })
-        .catch((err) => {
+    .catch((err) => {
       next(err);
     });
 };
 
 exports.getComments = (req, res, next) => {
-  const {review_id} = req.params
-  selectComments(review_id).then((comments)=>{
-    res.status(200).send({comments})
-  })
-  .catch((err)=>{
-    next(err)
-  })
-}
+  const { review_id } = req.params;
+  selectComments(review_id)
+    .then((comments) => {
+      res.status(200).send({ comments });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
 
 exports.postComment = (req, res, next) => {
-  const {review_id} = req.params
-  const author = req.body.username
-  const body = req.body.body
-  insertComment(review_id, author, body).then(([comment]) => {
-    res.status(201).send({comment})
- })
-  .catch((err)=>{
-    next(err)
-  })
-}
+  const { review_id } = req.params;
+  const author = req.body.username;
+  const body = req.body.body;
+  insertComment(review_id, author, body)
+    .then(([comment]) => {
+      res.status(201).send({ comment });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
 
 exports.patchReview = (req, res, next) => {
-  const {review_id} = req.params
-  updateReview(review_id, req.body).then(([review])=>{
-    res.status(200).send({review})
-  })
-  .catch((err)=>{
-    next(err)
-  })
-}
+  const { review_id } = req.params;
+  updateReview(review_id, req.body)
+    .then(([review]) => {
+      res.status(200).send({ review });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
