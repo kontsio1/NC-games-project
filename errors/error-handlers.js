@@ -25,3 +25,7 @@ exports.handleBadRequestErrors = (err, req, res, next) => {
   exports.finalHandleErrors = (err, req, res, next) => {
     res.status(500).send({ msg: "Internal server error!" });
   };
+
+  exports.handleWrongPath = (req, res) => {
+    res.status(404).send({msg: 'Sorry what?'})
+  }

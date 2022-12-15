@@ -10,6 +10,18 @@ afterAll(() => {
   if (db.end) db.end();
 });
 
+describe("2. GET -wrong path-",()=>{
+  test("status:404, responds with appropriate error message",()=>{
+    return request(app)
+    .get("/mistake/path")
+    .expect(404)
+    .then((res)=>{
+      const msg = res.body.msg
+      expect(msg).toBe('Sorry what?')
+    })
+  })
+})
+
 describe("3. GET /api/categories", () => {
   test("status:200, responds with an array of objects", () => {
     return request(app)
