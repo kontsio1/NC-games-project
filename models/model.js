@@ -74,7 +74,7 @@ exports.insertComment = (review_id, author, body) => {
 };
 
 exports.updateReview = (review_id, patchObject) => {
-  if (Object.keys(patchObject).length === 1) {
+  // if (Object.keys(patchObject).length === 1) {
     const { inc_votes } = patchObject;
     return db
       .query(
@@ -88,7 +88,7 @@ exports.updateReview = (review_id, patchObject) => {
           return data.rows;
         }
       });
-  } else {
-    return Promise.reject({ status: 400, msg: "Very Bad Request!" });
-  }
+  // } else {
+    // return Promise.reject({ status: 400, msg: "Very Bad Request!" });
+  // }
 };
