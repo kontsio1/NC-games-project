@@ -363,12 +363,12 @@ describe("10. GET /api/reviews (queries)", () => {
   describe("GET /api/reviews?category=...", () => {
     test("status:200, responds with an array of review objects of the query category", () => {
       return request(app)
-        .get("/api/reviews?category=hidden-roles")
+        .get("/api/reviews?category=social deduction")
         .expect(200)
         .then(({ body }) => {
           const { reviews } = body;
           reviews.forEach((review) => {
-            expect(review.category).toBe("hidden-roles");
+            expect(review.category).toBe('social deduction');
             expect(review).toEqual(
               expect.objectContaining({
                 owner: expect.any(String),
@@ -378,20 +378,19 @@ describe("10. GET /api/reviews (queries)", () => {
                 created_at: expect.any(String),
                 votes: expect.any(Number),
                 designer: expect.any(String),
-                comment_count: expect.any(Number),
               })
             );
           });
         });
     });
-    test("status:200, responds with an array of review objects of the query category", () => {
+    test("status:200, responds with an array of review objects of the query category cont'd", () => {
       return request(app)
-        .get("/api/reviews?category=strategy")
+        .get("/api/reviews?category=dexterity")
         .expect(200)
         .then(({ body }) => {
           const { reviews } = body;
           reviews.forEach((review) => {
-            expect(review.category).toBe("strategy");
+            expect(review.category).toBe("dexterity");
             expect(review).toEqual(
               expect.objectContaining({
                 owner: expect.any(String),
@@ -401,28 +400,27 @@ describe("10. GET /api/reviews (queries)", () => {
                 created_at: expect.any(String),
                 votes: expect.any(Number),
                 designer: expect.any(String),
-                comment_count: expect.any(Number),
               })
             );
           });
         });
     });
-    test("status:200 query category does not exist", () => {
+    test("status:400 query category does not exist", () => {
       return request(app)
         .get("/api/reviews?category=pop-culture")
         .expect(400)
         .then((res) => {
           const msg = res.body.msg;
-          expect(msg).toBe("Bad Request!");
+          expect(msg).toBe("Very Bad Request!");
         });
     });
-    test("status:200 query category exists but has no reviews", () => {
+    test("status:400 query category exists but has no reviews", () => {
       return request(app)
         .get("/api/reviews?category=children''s games")
-        .expect(200)
-        .then(({ body }) => {
-          const { reviews } = body;
-          expect(reviews).toEqual([]);
+        .expect(400)
+        .then((res) => {
+          const msg = res.body.msg;
+          expect(msg).toBe("Very Bad Request!");
         });
     });
   });
@@ -485,13 +483,13 @@ describe("10. GET /api/reviews (queries)", () => {
   describe("GET /api/reviews?category=...&sort_by=...&order=...", () => {
     test("status:200 3 queries - responds with an array of ordered sorted review objects", () => {
       return request(app)
-        .get("/api/reviews?category=strategy&&sort_by=owner&&order=asc")
+        .get("/api/reviews?category=social deduction&&sort_by=owner&&order=asc")
         .expect(200)
         .then(({ body }) => {
           const { reviews } = body;
           expect(reviews).toBeSortedBy("owner");
           reviews.forEach((review) => {
-            expect(review.category).toBe("strategy");
+            expect(review.category).toBe("social deduction");
             expect(review).toEqual(
               expect.objectContaining({
                 owner: expect.any(String),
@@ -508,13 +506,13 @@ describe("10. GET /api/reviews (queries)", () => {
     });
     test("status:200 2 queries - responds with an array of ordered sorted review objects", () => {
       return request(app)
-        .get("/api/reviews?category=strategy&&sort_by=votes")
+        .get("/api/reviews?category=social deduction&&sort_by=votes")
         .expect(200)
         .then(({ body }) => {
           const { reviews } = body;
           expect(reviews).toBeSortedBy("votes", { descending: true });
           reviews.forEach((review) => {
-            expect(review.category).toBe("strategy");
+            expect(review.category).toBe("social deduction");
             expect(review).toEqual(
               expect.objectContaining({
                 owner: expect.any(String),
@@ -527,6 +525,15 @@ describe("10. GET /api/reviews (queries)", () => {
               })
             );
           });
+        });
+    });
+    test("status:400 order query is not valid", () => {
+      return request(app)
+        .get("/api/reviews?order=pinapple")
+        .expect(400)
+        .then((res) => {
+          const msg = res.body.msg;
+          expect(msg).toBe("Very Bad Request!");
         });
     });
   });

@@ -26,9 +26,7 @@ exports.getReviews = (req, res, next) => {
       return query;
     }
   });
-  console.log(req.query, queries, "<<controller");
-
-  if (req.query === undefined) {
+  if (Object.keys(req.query).length === 0) {
     selectReviews()
       .then((reviews) => {
         res.status(200).send({ reviews });
@@ -42,11 +40,9 @@ exports.getReviews = (req, res, next) => {
     queryStr = selectReviewsByCategory(queries[0], queryStr);
     queryStr = sortReviewsByColumn(queries[1], queryStr);
     sortReviewsOrder(queries[2], queryStr, queryValues).then((reviews) => {
-      // console.log(reviews, '<<OUTPUT')
       res.status(200).send({ reviews });
     })
     .catch((err) => {
-      console.log(err.code)
       next(err);
     });
   }

@@ -91,8 +91,7 @@ exports.updateReview = (review_id, patchObject) => {
 exports.selectReviewsByCategory = (category = 0, queryStr) => {
   if (category !== 0) { //not undefined
     queryStr += ` WHERE category = $1`;
-    console.log(queryStr, "<<selectReviewCategory");
-  }
+  } 
   return queryStr;
 };
 
@@ -108,10 +107,8 @@ exports.sortReviewsByColumn = (column = "created_at", queryStr) => {
     "created_at",
     "votes",
   ];
-  console.log(column, '<<COLUMN')
   if (validColumns.includes(column)) {
     queryStr += ` ORDER BY ${column}`;
-    console.log(queryStr, "<<validColumns");
     return queryStr;
   }
 };
@@ -120,17 +117,20 @@ exports.sortReviewsOrder = (order = 'DESC', queryStr, queryValues = 0) => {
   const validOrders = ['ASC','DESC']
   if (validOrders.includes(order.toUpperCase())) {
     queryStr += ` ${order.toUpperCase()}`
-    console.log(queryStr,queryValues, "<<sortReviews")
     if (queryValues === 0) {
       return db.query(queryStr).then((data)=>{
-        console.log('hi')
         return data.rows
       })
     } else {
       return db.query(queryStr, [`${queryValues}`]).then((data)=>{
-        console.log('hey')
-        return data.rows
+        if (data.rows.length === 0) {
+          return Promise.reject({ status: 400, msg: "Very Bad Request!" });
+        } else {
+          return data.rows
+        }
       })
     }
+  } else {
+    return Promise.reject({ status: 400, msg: "Very Bad Request!" });
   }
 };
