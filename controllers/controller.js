@@ -8,6 +8,7 @@ const {
   selectReviewsByCategory,
   sortReviewsByColumn,
   sortReviewsOrder,
+  handleQueries
 } = require("../models/model");
 
 exports.getCategories = (req, res, next) => {
@@ -17,35 +18,12 @@ exports.getCategories = (req, res, next) => {
 };
 
 exports.getReviews = (req, res, next) => {
-  // const validQueries = ["category", "sort_by", "order"];
-  let queries = [req.query.category, req.query.sort_by, req.query.order];
-  queries = queries.map((query) => {
-    if (query === "") {
-      return undefined;
-    } else {
-      return query;
-    }
+  handleQueries(req).then((reviews)=>{
+    res.status(200).send({ reviews })
+  })
+  .catch((err) => {
+    next(err);
   });
-  if (Object.keys(req.query).length === 0) {
-    selectReviews()
-      .then((reviews) => {
-        res.status(200).send({ reviews });
-      })
-      .catch((err) => {
-        next(err);
-      });
-  } else {
-    const queryValues = queries[0]; //$1
-    let queryStr = `SELECT * FROM reviews`;
-    queryStr = selectReviewsByCategory(queries[0], queryStr);
-    queryStr = sortReviewsByColumn(queries[1], queryStr);
-    sortReviewsOrder(queries[2], queryStr, queryValues).then((reviews) => {
-      res.status(200).send({ reviews });
-    })
-    .catch((err) => {
-      next(err);
-    });
-  }
 };
 
 exports.getReview = (req, res, next) => {

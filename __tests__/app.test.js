@@ -367,6 +367,7 @@ describe("10. GET /api/reviews (queries)", () => {
         .expect(200)
         .then(({ body }) => {
           const { reviews } = body;
+          expect(reviews).toHaveLength(11)
           reviews.forEach((review) => {
             expect(review.category).toBe('social deduction');
             expect(review).toEqual(
@@ -416,12 +417,13 @@ describe("10. GET /api/reviews (queries)", () => {
     });
     test("status:400 query category exists but has no reviews", () => {
       return request(app)
-        .get("/api/reviews?category=children''s games")
-        .expect(400)
-        .then((res) => {
-          const msg = res.body.msg;
-          expect(msg).toBe("Very Bad Request!");
-        });
+        .get("/api/reviews?category=children's games")
+        .expect(200)
+        .expect(200)
+        .then(({ body }) => {
+          const { reviews } = body;
+          expect(reviews).toEqual([])
+        })
     });
   });
   describe("GET /api/reviews?sort_by=...", () => {
@@ -431,6 +433,7 @@ describe("10. GET /api/reviews (queries)", () => {
         .expect(200)
         .then(({ body }) => {
           const { reviews } = body;
+          expect(reviews).toHaveLength(13)
           expect(reviews).toBeSortedBy("owner", { descending: true });
           reviews.forEach((review) => {
             expect(review).toEqual(

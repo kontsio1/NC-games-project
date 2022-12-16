@@ -6,7 +6,7 @@ exports.selectCategories = () => {
   });
 };
 
-exports.selectReviews = () => {
+selectReviews = () => {
   return db
     .query(
       `SELECT reviews.*, COUNT(comment_id) AS comment_count
@@ -88,14 +88,24 @@ exports.updateReview = (review_id, patchObject) => {
       }
     });
 };
-exports.selectReviewsByCategory = (category = 0, queryStr) => {
-  if (category !== 0) { //not undefined
-    queryStr += ` WHERE category = $1`;
-  } 
-  return queryStr;
+selectReviewsByCategory = (category = 0, queryStr) => {
+  return db.query(`SELECT slug FROM categories`).then((data) => {
+    const validCategoriesArr = data.rows.map((categ) => {
+      return categ.slug;
+    });
+    if (category !== 0) {
+      //not undefined
+      if (validCategoriesArr.includes(category)) {
+        queryStr += ` WHERE category = $1`;
+      } else {
+        return Promise.reject({ status: 400, msg: "Very Bad Request!" });
+      }
+    }
+    return queryStr;
+  });
 };
 
-exports.sortReviewsByColumn = (column = "created_at", queryStr) => {
+sortReviewsByColumn = (column = "created_at", queryStr) => {
   const validColumns = [
     "review_id",
     "title",
@@ -113,24 +123,50 @@ exports.sortReviewsByColumn = (column = "created_at", queryStr) => {
   }
 };
 
-exports.sortReviewsOrder = (order = 'DESC', queryStr, queryValues = 0) => {
-  const validOrders = ['ASC','DESC']
+sortReviewsOrder = async (order = "DESC", queryStr, queryValues = 0) => {
+  const validOrders = ["ASC", "DESC"];
   if (validOrders.includes(order.toUpperCase())) {
-    queryStr += ` ${order.toUpperCase()}`
+    queryStr += ` ${order.toUpperCase()}`;
     if (queryValues === 0) {
-      return db.query(queryStr).then((data)=>{
-        return data.rows
-      })
+      return db.query(queryStr).then((data) => {
+        return data.rows;
+      });
     } else {
-      return db.query(queryStr, [`${queryValues}`]).then((data)=>{
-        if (data.rows.length === 0) {
-          return Promise.reject({ status: 400, msg: "Very Bad Request!" });
-        } else {
-          return data.rows
-        }
-      })
+      return db.query(queryStr, [`${queryValues}`]).then((data) => {
+          return data.rows;
+      });
     }
   } else {
     return Promise.reject({ status: 400, msg: "Very Bad Request!" });
+  }
+};
+
+exports.handleQueries = (req) => {
+  let queries = [req.query.category, req.query.sort_by, req.query.order];
+  queries = queries.map((query) => {
+    if (query === "") {
+      return undefined;
+    } else {
+      return query;
+    }
+  });
+  if (Object.keys(req.query).length === 0) {
+    //if there is no query
+    return selectReviews().then((reviews) => {
+      return reviews;
+    });
+  } else {
+    const queryValues = queries[0]; //$1
+    let queryStr = `SELECT * FROM reviews`;
+    return (queryStr = selectReviewsByCategory(queries[0], queryStr).then(
+      (queryStr) => {
+        queryStr = sortReviewsByColumn(queries[1], queryStr);
+        return sortReviewsOrder(queries[2], queryStr, queryValues).then(
+          (reviews) => {
+            return reviews;
+          }
+        );
+      }
+    ));
   }
 };
