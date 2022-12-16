@@ -7,6 +7,7 @@ const {
   updateReview,
   selectReviewsByCategory,
   sortReviewsByColumn,
+  sortReviewsOrder,
 } = require("../models/model");
 
 exports.getCategories = (req, res, next) => {
@@ -18,6 +19,7 @@ exports.getCategories = (req, res, next) => {
 exports.getReviews = (req, res, next) => {
   const validQueries = ["category", "sort_by", "order"];
   const query = Object.keys(req.query)[0];
+  console.log(req.query, query)
   if (query === undefined) {
     selectReviews().then((reviews) => {
       res.status(200).send({ reviews })
@@ -26,6 +28,8 @@ exports.getReviews = (req, res, next) => {
     });
   } else {
     const validQueryIndex = validQueries.indexOf(query);
+
+
     if (validQueryIndex === 0) {
       const selectedCategory = req.query.category;
       selectReviewsByCategory(selectedCategory).then((reviews) => {
@@ -40,6 +44,8 @@ exports.getReviews = (req, res, next) => {
       }).catch((err) => {
         next(err);
       });
+    } else if (validQueryIndex === 2) {
+      sortReviewsOrder()
     } else {
       res.status(400).send({ msg: "Very Bad Request!" });
     }

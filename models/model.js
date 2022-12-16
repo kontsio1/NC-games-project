@@ -98,10 +98,14 @@ exports.sortReviewsByColumn = (column) => {
   if(column === "") column = 'created_at'
   validColumns = ['review_id','title','category','designer','owner','review_body','review_img_url','created_at','votes']
   if (validColumns.includes(column)) {
-  return db.query(`SELECT * FROM reviews ORDER BY ${column} ASC;`).then((data)=>{
+  return db.query(`SELECT * FROM reviews ORDER BY ${column} DESC;`).then((data)=>{
     return data.rows
   })
 } else {
   return Promise.reject({status:400, msg:"Very Bad Request!"})
 }
+}
+
+exports.sortReviewsOrder = (order) => {
+  
 }
