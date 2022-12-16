@@ -133,7 +133,7 @@ sortReviewsOrder = async (order = "DESC", queryStr, queryValues = 0) => {
       });
     } else {
       return db.query(queryStr, [`${queryValues}`]).then((data) => {
-          return data.rows;
+        return data.rows;
       });
     }
   } else {

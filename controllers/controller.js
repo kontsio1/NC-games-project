@@ -1,14 +1,5 @@
 const {
-  selectCategories,
-  selectReviews,
-  selectReview,
-  insertComment,
-  selectComments,
-  updateReview,
-  selectReviewsByCategory,
-  sortReviewsByColumn,
-  sortReviewsOrder,
-  handleQueries
+  selectCategories,selectReview,insertComment,selectComments,updateReview,handleQueries,
 } = require("../models/model");
 
 exports.getCategories = (req, res, next) => {
@@ -18,12 +9,13 @@ exports.getCategories = (req, res, next) => {
 };
 
 exports.getReviews = (req, res, next) => {
-  handleQueries(req).then((reviews)=>{
-    res.status(200).send({ reviews })
-  })
-  .catch((err) => {
-    next(err);
-  });
+  handleQueries(req)
+    .then((reviews) => {
+      res.status(200).send({ reviews });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 
 exports.getReview = (req, res, next) => {

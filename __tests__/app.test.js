@@ -358,7 +358,6 @@ describe("8. PATCH /api/reviews/:review_id", () => {
       });
   });
 });
-
 describe("10. GET /api/reviews (queries)", () => {
   describe("GET /api/reviews?category=...", () => {
     test("status:200, responds with an array of review objects of the query category", () => {
