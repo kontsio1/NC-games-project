@@ -1,6 +1,7 @@
 const express = require("express");
+const { getCategories, getReviews, getReview, getComments, postComment, patchReview, getUsers } = require("./controllers/controller");
 const {handleBadRequestErrors, handleCustomErrors, finalHandleErrors, handleNotFoundErrors, handleWrongPath} = require('./errors/error-handlers')
-const { getCategories, getReviews, getReview, getComments, postComment, patchReview } = require("./controllers/controller");
+
 const app = express();
 app.use(express.json());
 
@@ -14,7 +15,9 @@ app.get("/api/reviews/:review_id/comments", getComments);
 
 app.post("/api/reviews/:review_id/comments", postComment);
 
-app.patch('/api/reviews/:review_id', patchReview)
+app.patch("/api/reviews/:review_id", patchReview)
+
+app.get("/api/users", getUsers)
 
 
 //to error handling functions
