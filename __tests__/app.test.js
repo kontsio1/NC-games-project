@@ -360,15 +360,6 @@ describe("8. PATCH /api/reviews/:review_id", () => {
 });
 
 describe("10. GET /api/reviews (queries)", () => {
-  test("status:400 invalid query schema", () => {
-    return request(app)
-      .get("/api/reviews?bananas")
-      .expect(400)
-      .then((res) => {
-        const msg = res.body.msg;
-        expect(msg).toBe("Very Bad Request!");
-      });
-  });
   describe("GET /api/reviews?category=...", () => {
     test("status:200, responds with an array of review objects of the query category", () => {
       return request(app)
@@ -419,91 +410,124 @@ describe("10. GET /api/reviews (queries)", () => {
     test("status:200 query category does not exist", () => {
       return request(app)
         .get("/api/reviews?category=pop-culture")
+        .expect(400)
+        .then((res) => {
+          const msg = res.body.msg;
+          expect(msg).toBe("Bad Request!");
+        });
+    });
+    test("status:200 query category exists but has no reviews", () => {
+      return request(app)
+        .get("/api/reviews?category=children''s games")
         .expect(200)
         .then(({ body }) => {
           const { reviews } = body;
           expect(reviews).toEqual([]);
         });
     });
-    describe("GET /api/reviews?sort_by=...", () => {
-      test("status:200 responds with an array of sorted review objects", () => {
-        return request(app)
-          .get("/api/reviews?sort_by=owner")
-          .expect(200)
-          .then(({ body }) => {
-            const { reviews } = body;
-            expect(reviews).toBeSortedBy("owner", { descending: true });
-            reviews.forEach((review) => {
-              expect(review).toEqual(
-                expect.objectContaining({
-                  owner: expect.any(String),
-                  title: expect.any(String),
-                  review_id: expect.any(Number),
-                  review_img_url: expect.any(String),
-                  created_at: expect.any(String),
-                  votes: expect.any(Number),
-                  designer: expect.any(String),
-                })
-              );
-            });
+  });
+  describe("GET /api/reviews?sort_by=...", () => {
+    test("status:200 responds with an array of sorted review objects", () => {
+      return request(app)
+        .get("/api/reviews?sort_by=owner")
+        .expect(200)
+        .then(({ body }) => {
+          const { reviews } = body;
+          expect(reviews).toBeSortedBy("owner", { descending: true });
+          reviews.forEach((review) => {
+            expect(review).toEqual(
+              expect.objectContaining({
+                owner: expect.any(String),
+                title: expect.any(String),
+                review_id: expect.any(Number),
+                review_img_url: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                designer: expect.any(String),
+              })
+            );
           });
-      });
-      test("status:200 responds with an array of sorted review objects", () => {
-        return request(app)
-          .get("/api/reviews?sort_by")
-          .expect(200)
-          .then(({ body }) => {
-            const { reviews } = body;
-            expect(reviews).toBeSortedBy("created_at", { descending: true });
-            reviews.forEach((review) => {
-              expect(review).toEqual(
-                expect.objectContaining({
-                  owner: expect.any(String),
-                  title: expect.any(String),
-                  review_id: expect.any(Number),
-                  review_img_url: expect.any(String),
-                  created_at: expect.any(String),
-                  votes: expect.any(Number),
-                  designer: expect.any(String),
-                })
-              );
-            });
-          });
-      });
-      test("status:400 query category does not exist", () => {
-        return request(app)
-          .get("/api/reviews?sort_by=pop-culture")
-          .expect(400)
-          .then((res) => {
-            console.log(res.body);
-            const msg = res.body.msg;
-            expect(msg).toBe("Very Bad Request!");
-          });
-      });
+        });
     });
-    describe.only("GET /api/reviews?sort_by=...&order=...", () => {
-      test("status:200 responds with an array of ordered sorted review objects", () => {
-        return request(app)
-          .get("/api/reviews?sort_by=owner&order=asc")
-          .expect(200)
-          .then(({ body }) => {
-            const { reviews } = body;
-            expect(reviews).toBeSortedBy("owner");
-            reviews.forEach((review) => {
-              expect(review).toEqual(
-                expect.objectContaining({
-                  owner: expect.any(String),
-                  title: expect.any(String),
-                  review_id: expect.any(Number),
-                  review_img_url: expect.any(String),
-                  created_at: expect.any(String),
-                  votes: expect.any(Number),
-                  designer: expect.any(String),
-                })
-              );
-            });
+    test("status:200 responds with an array of sorted review objects -default date", () => {
+      return request(app)
+        .get("/api/reviews?sort_by")
+        .expect(200)
+        .then(({ body }) => {
+          const { reviews } = body;
+          expect(reviews).toBeSortedBy("created_at", { descending: true });
+          reviews.forEach((review) => {
+            expect(review).toEqual(
+              expect.objectContaining({
+                owner: expect.any(String),
+                title: expect.any(String),
+                review_id: expect.any(Number),
+                review_img_url: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                designer: expect.any(String),
+              })
+            );
           });
-      });
+        });
+    });
+    test("status:400 query category does not exist", () => {
+      return request(app)
+        .get("/api/reviews?sort_by=pop-culture")
+        .expect(400)
+        .then((res) => {
+          console.log(res.body);
+          const msg = res.body.msg;
+          expect(msg).toBe("Very Bad Request!");
+        });
+    });
+  });
+  describe("GET /api/reviews?category=...&sort_by=...&order=...", () => {
+    test("status:200 3 queries - responds with an array of ordered sorted review objects", () => {
+      return request(app)
+        .get("/api/reviews?category=strategy&&sort_by=owner&&order=asc")
+        .expect(200)
+        .then(({ body }) => {
+          const { reviews } = body;
+          expect(reviews).toBeSortedBy("owner");
+          reviews.forEach((review) => {
+            expect(review.category).toBe("strategy");
+            expect(review).toEqual(
+              expect.objectContaining({
+                owner: expect.any(String),
+                title: expect.any(String),
+                review_id: expect.any(Number),
+                review_img_url: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                designer: expect.any(String),
+              })
+            );
+          });
+        });
+    });
+    test("status:200 2 queries - responds with an array of ordered sorted review objects", () => {
+      return request(app)
+        .get("/api/reviews?category=strategy&&sort_by=votes")
+        .expect(200)
+        .then(({ body }) => {
+          const { reviews } = body;
+          expect(reviews).toBeSortedBy("votes", { descending: true });
+          reviews.forEach((review) => {
+            expect(review.category).toBe("strategy");
+            expect(review).toEqual(
+              expect.objectContaining({
+                owner: expect.any(String),
+                title: expect.any(String),
+                review_id: expect.any(Number),
+                review_img_url: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                designer: expect.any(String),
+              })
+            );
+          });
+        });
     });
   });
 });

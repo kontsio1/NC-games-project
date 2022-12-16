@@ -17,38 +17,38 @@ exports.getCategories = (req, res, next) => {
 };
 
 exports.getReviews = (req, res, next) => {
-  const validQueries = ["category", "sort_by", "order"];
-  const query = Object.keys(req.query)[0];
-  console.log(req.query, query)
-  if (query === undefined) {
-    selectReviews().then((reviews) => {
-      res.status(200).send({ reviews })
-    }).catch((err) => {
+  // const validQueries = ["category", "sort_by", "order"];
+  let queries = [req.query.category, req.query.sort_by, req.query.order];
+  queries = queries.map((query) => {
+    if (query === "") {
+      return undefined;
+    } else {
+      return query;
+    }
+  });
+  console.log(req.query, queries, "<<controller");
+
+  if (req.query === undefined) {
+    selectReviews()
+      .then((reviews) => {
+        res.status(200).send({ reviews });
+      })
+      .catch((err) => {
+        next(err);
+      });
+  } else {
+    const queryValues = queries[0]; //$1
+    let queryStr = `SELECT * FROM reviews`;
+    queryStr = selectReviewsByCategory(queries[0], queryStr);
+    queryStr = sortReviewsByColumn(queries[1], queryStr);
+    sortReviewsOrder(queries[2], queryStr, queryValues).then((reviews) => {
+      // console.log(reviews, '<<OUTPUT')
+      res.status(200).send({ reviews });
+    })
+    .catch((err) => {
+      console.log(err.code)
       next(err);
     });
-  } else {
-    const validQueryIndex = validQueries.indexOf(query);
-
-
-    if (validQueryIndex === 0) {
-      const selectedCategory = req.query.category;
-      selectReviewsByCategory(selectedCategory).then((reviews) => {
-        res.status(200).send({ reviews })
-      }).catch((err) => {
-        next(err);
-      });
-    } else if (validQueryIndex === 1) {
-      const sortColumn = req.query.sort_by;
-      sortReviewsByColumn(sortColumn).then((reviews)=>{
-        res.status(200).send({ reviews })
-      }).catch((err) => {
-        next(err);
-      });
-    } else if (validQueryIndex === 2) {
-      sortReviewsOrder()
-    } else {
-      res.status(400).send({ msg: "Very Bad Request!" });
-    }
   }
 };
 

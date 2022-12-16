@@ -74,38 +74,63 @@ exports.insertComment = (review_id, author, body) => {
 };
 
 exports.updateReview = (review_id, patchObject) => {
-    const { inc_votes } = patchObject;
-    return db
-      .query(
-        `UPDATE reviews SET votes = votes + $1 WHERE review_id=$2 RETURNING * ;`,
-        [inc_votes, review_id]
-      )
-      .then((data) => {
-        if (data.rows.length === 0) {
-          return Promise.reject({status:404, msg:"Not Found!"})
-        } else {
-          return data.rows;
-        }
-      });
+  const { inc_votes } = patchObject;
+  return db
+    .query(
+      `UPDATE reviews SET votes = votes + $1 WHERE review_id=$2 RETURNING * ;`,
+      [inc_votes, review_id]
+    )
+    .then((data) => {
+      if (data.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Not Found!" });
+      } else {
+        return data.rows;
+      }
+    });
 };
-exports.selectReviewsByCategory = (category) => {
-  return db.query(`SELECT * FROM reviews WHERE category = $1;`,[category]).then((data)=>{
-    return data.rows
-  })
-}
+exports.selectReviewsByCategory = (category = 0, queryStr) => {
+  if (category !== 0) { //not undefined
+    queryStr += ` WHERE category = $1`;
+    console.log(queryStr, "<<selectReviewCategory");
+  }
+  return queryStr;
+};
 
-exports.sortReviewsByColumn = (column) => {
-  if(column === "") column = 'created_at'
-  validColumns = ['review_id','title','category','designer','owner','review_body','review_img_url','created_at','votes']
+exports.sortReviewsByColumn = (column = "created_at", queryStr) => {
+  const validColumns = [
+    "review_id",
+    "title",
+    "category",
+    "designer",
+    "owner",
+    "review_body",
+    "review_img_url",
+    "created_at",
+    "votes",
+  ];
+  console.log(column, '<<COLUMN')
   if (validColumns.includes(column)) {
-  return db.query(`SELECT * FROM reviews ORDER BY ${column} DESC;`).then((data)=>{
-    return data.rows
-  })
-} else {
-  return Promise.reject({status:400, msg:"Very Bad Request!"})
-}
-}
+    queryStr += ` ORDER BY ${column}`;
+    console.log(queryStr, "<<validColumns");
+    return queryStr;
+  }
+};
 
-exports.sortReviewsOrder = (order) => {
-  
-}
+exports.sortReviewsOrder = (order = 'DESC', queryStr, queryValues = 0) => {
+  const validOrders = ['ASC','DESC']
+  if (validOrders.includes(order.toUpperCase())) {
+    queryStr += ` ${order.toUpperCase()}`
+    console.log(queryStr,queryValues, "<<sortReviews")
+    if (queryValues === 0) {
+      return db.query(queryStr).then((data)=>{
+        console.log('hi')
+        return data.rows
+      })
+    } else {
+      return db.query(queryStr, [`${queryValues}`]).then((data)=>{
+        console.log('hey')
+        return data.rows
+      })
+    }
+  }
+};
