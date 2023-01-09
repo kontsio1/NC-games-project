@@ -1,5 +1,5 @@
 const {
-  selectCategories,selectReview,insertComment,selectComments,updateReview,handleQueries,
+  selectCategories,selectReview,insertComment,selectComments,updateReview,handleQueries,selectUsers
 } = require("../models/model");
 
 exports.getCategories = (req, res, next) => {
@@ -54,12 +54,20 @@ exports.postComment = (req, res, next) => {
 };
 
 exports.patchReview = (req, res, next) => {
-  const { review_id } = req.params;
-  updateReview(review_id, req.body)
-    .then(([review]) => {
-      res.status(200).send({ review });
-    })
-    .catch((err) => {
-      next(err);
-    });
-};
+  const {review_id} = req.params
+  updateReview(review_id, req.body).then(([review])=>{
+    res.status(200).send({review})
+  })
+  .catch((err)=>{
+    next(err)
+  })
+}
+
+exports.getUsers = (req, res, next) => {
+  selectUsers().then((users)=> {
+    res.status(200).send({users})
+  })
+  .catch((err)=>{
+    next(err)
+  })
+}
