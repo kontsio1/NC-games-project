@@ -1,8 +1,10 @@
 const express = require("express");
 const {handleBadRequestErrors, handleCustomErrors, finalHandleErrors, handleNotFoundErrors, handleWrongPath} = require('./errors/error-handlers')
-const { getCategories, getReviews, getReview, getComments, postComment, patchReview, getUsers} = require("./controllers/controller");
+const { getCategories, getReviews, getReview, getComments, postComment, patchReview, getUsers, getApi} = require("./controllers/controller");
 const app = express();
 app.use(express.json());
+
+app.get("/api/", getApi)
 
 app.get("/api/categories", getCategories);
 

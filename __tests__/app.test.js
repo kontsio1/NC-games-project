@@ -10,6 +10,14 @@ afterAll(() => {
   if (db.end) db.end();
 });
 
+describe("1. GET /api", () => {
+  test("status:200, responds with OK", () => {
+    return request(app)
+      .get("/api/")
+      .expect(200)
+  });
+});
+
 describe("2. GET -wrong path-", () => {
   test("status:404, responds with appropriate error message", () => {
     return request(app)

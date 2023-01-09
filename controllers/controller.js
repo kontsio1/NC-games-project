@@ -2,6 +2,10 @@ const {
   selectCategories,selectReview,insertComment,selectComments,updateReview,handleQueries,selectUsers
 } = require("../models/model");
 
+exports.getApi = (req, res, next) => {
+  res.status(200).send({msg: 'OK'})
+}
+
 exports.getCategories = (req, res, next) => {
   selectCategories().then((categories) => {
     res.status(200).send({ categories });
