@@ -10,17 +10,17 @@ afterAll(() => {
   if (db.end) db.end();
 });
 
-describe("2. GET -wrong path-",()=>{
-  test("status:404, responds with appropriate error message",()=>{
+describe("2. GET -wrong path-", () => {
+  test("status:404, responds with appropriate error message", () => {
     return request(app)
-    .get("/mistake/path")
-    .expect(404)
-    .then((res)=>{
-      const msg = res.body.msg
-      expect(msg).toBe('Sorry what?')
-    })
-  })
-})
+      .get("/mistake/path")
+      .expect(404)
+      .then((res) => {
+        const msg = res.body.msg;
+        expect(msg).toBe("Sorry what?");
+      });
+  });
+});
 
 describe("3. GET /api/categories", () => {
   test("status:200, responds with an array of objects", () => {
@@ -86,7 +86,7 @@ describe("5. GET /api/reviews/:review_id", () => {
             "Fugiat fugiat enim officia laborum quis. Aliquip laboris non nulla nostrud magna exercitation in ullamco aute laborum cillum nisi sint. Culpa excepteur aute cillum minim magna fugiat culpa adipisicing eiusmod laborum ipsum fugiat quis. Mollit consectetur amet sunt ex amet tempor magna consequat dolore cillum adipisicing. Proident est sunt amet ipsum magna proident fugiat deserunt mollit officia magna ea pariatur. Ullamco proident in nostrud pariatur. Minim consequat pariatur id pariatur adipisicing.",
           review_img_url:
             "https://images.pexels.com/photos/278918/pexels-photo-278918.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-          created_at: "2020-09-13T12:19:28.077Z",
+          created_at: "2020-09-13T14:19:28.077Z",
           votes: 8,
         });
       });
@@ -262,7 +262,7 @@ describe("8. PATCH /api/reviews/:review_id", () => {
             "Consectetur incididunt aliquip sunt officia. Magna ex nulla consectetur laboris incididunt ea non qui. Enim id eiusmod irure dolor ipsum in tempor consequat amet ullamco. Occaecat fugiat sint fugiat mollit consequat pariatur consequat non exercitation dolore. Labore occaecat in magna commodo anim enim eiusmod eu pariatur ad duis magna. Voluptate ad et dolore ullamco anim sunt do. Qui exercitation tempor in in minim ullamco fugiat ipsum. Duis irure voluptate cupidatat do id mollit veniam culpa. Velit deserunt exercitation amet laborum nostrud dolore in occaecat minim amet nostrud sunt in. Veniam ut aliqua incididunt commodo sint in anim duis id commodo voluptate sit quis.",
           review_img_url:
             "https://images.pexels.com/photos/278888/pexels-photo-278888.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-          created_at: "2021-01-25T09:16:54.963Z",
+          created_at: "2021-01-25T11:16:54.963Z",
           votes: 10,
         });
       });
@@ -285,77 +285,259 @@ describe("8. PATCH /api/reviews/:review_id", () => {
             "Consectetur incididunt aliquip sunt officia. Magna ex nulla consectetur laboris incididunt ea non qui. Enim id eiusmod irure dolor ipsum in tempor consequat amet ullamco. Occaecat fugiat sint fugiat mollit consequat pariatur consequat non exercitation dolore. Labore occaecat in magna commodo anim enim eiusmod eu pariatur ad duis magna. Voluptate ad et dolore ullamco anim sunt do. Qui exercitation tempor in in minim ullamco fugiat ipsum. Duis irure voluptate cupidatat do id mollit veniam culpa. Velit deserunt exercitation amet laborum nostrud dolore in occaecat minim amet nostrud sunt in. Veniam ut aliqua incididunt commodo sint in anim duis id commodo voluptate sit quis.",
           review_img_url:
             "https://images.pexels.com/photos/278888/pexels-photo-278888.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-          created_at: "2021-01-25T09:16:54.963Z",
+          created_at: "2021-01-25T11:16:54.963Z",
           votes: 6,
         });
       });
   });
   test("status:200 patch body includes invalid fields", () => {
-    const patchedVotes = {inc_votes: 4, bestProgrammerAround: 'me'};
+    const patchedVotes = { inc_votes: 4, bestProgrammerAround: "me" };
     return request(app)
-    .patch("/api/reviews/7")
-    .send(patchedVotes)
-    .expect(200)
-    .then(({ body }) => {
-      const { review } = body;
-      expect(review).toMatchObject({
-        review_id: 7,
-        title: "Mollit elit qui incididunt veniam occaecat cupidatat",
-        category: "social deduction",
-        designer: "Avery Wunzboogerz",
-        owner: "mallionaire",
-        review_body:
-          "Consectetur incididunt aliquip sunt officia. Magna ex nulla consectetur laboris incididunt ea non qui. Enim id eiusmod irure dolor ipsum in tempor consequat amet ullamco. Occaecat fugiat sint fugiat mollit consequat pariatur consequat non exercitation dolore. Labore occaecat in magna commodo anim enim eiusmod eu pariatur ad duis magna. Voluptate ad et dolore ullamco anim sunt do. Qui exercitation tempor in in minim ullamco fugiat ipsum. Duis irure voluptate cupidatat do id mollit veniam culpa. Velit deserunt exercitation amet laborum nostrud dolore in occaecat minim amet nostrud sunt in. Veniam ut aliqua incididunt commodo sint in anim duis id commodo voluptate sit quis.",
-        review_img_url:
-          "https://images.pexels.com/photos/278888/pexels-photo-278888.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-        created_at: "2021-01-25T09:16:54.963Z",
-        votes: 13,
+      .patch("/api/reviews/7")
+      .send(patchedVotes)
+      .expect(200)
+      .then(({ body }) => {
+        const { review } = body;
+        expect(review).toMatchObject({
+          review_id: 7,
+          title: "Mollit elit qui incididunt veniam occaecat cupidatat",
+          category: "social deduction",
+          designer: "Avery Wunzboogerz",
+          owner: "mallionaire",
+          review_body:
+            "Consectetur incididunt aliquip sunt officia. Magna ex nulla consectetur laboris incididunt ea non qui. Enim id eiusmod irure dolor ipsum in tempor consequat amet ullamco. Occaecat fugiat sint fugiat mollit consequat pariatur consequat non exercitation dolore. Labore occaecat in magna commodo anim enim eiusmod eu pariatur ad duis magna. Voluptate ad et dolore ullamco anim sunt do. Qui exercitation tempor in in minim ullamco fugiat ipsum. Duis irure voluptate cupidatat do id mollit veniam culpa. Velit deserunt exercitation amet laborum nostrud dolore in occaecat minim amet nostrud sunt in. Veniam ut aliqua incididunt commodo sint in anim duis id commodo voluptate sit quis.",
+          review_img_url:
+            "https://images.pexels.com/photos/278888/pexels-photo-278888.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+          created_at: "2021-01-25T11:16:54.963Z",
+          votes: 13,
+        });
       });
-    });
   });
   test("status:400 patch body missing required fields", () => {
     const patchedVotes = {};
     return request(app)
-    .patch("/api/reviews/7")
-    .send(patchedVotes)
-    .expect(400)
-    .then((res)=>{
-      const msg = res.body.msg
-      expect(msg).toBe("Very Bad Request!")
-    })
+      .patch("/api/reviews/7")
+      .send(patchedVotes)
+      .expect(400)
+      .then((res) => {
+        const msg = res.body.msg;
+        expect(msg).toBe("Very Bad Request!");
+      });
   });
   test("status:400 patch body invalid inc_votes increment", () => {
-    const patchedVotes = {inc_votes: "It's snowing!"};
+    const patchedVotes = { inc_votes: "It's snowing!" };
     return request(app)
-    .patch("/api/reviews/7")
-    .send(patchedVotes)
-    .expect(400)
-    .then((res)=>{
-      const msg = res.body.msg
-      expect(msg).toBe("Very Bad Request!")
-    })
+      .patch("/api/reviews/7")
+      .send(patchedVotes)
+      .expect(400)
+      .then((res) => {
+        const msg = res.body.msg;
+        expect(msg).toBe("Very Bad Request!");
+      });
   });
   test("status:400 invalid review_id", () => {
-    const patchedVotes = {inc_votes: 2};
+    const patchedVotes = { inc_votes: 2 };
     return request(app)
-    .patch("/api/reviews/bananas")
-    .send(patchedVotes)
-    .expect(400)
-    .then((res)=>{
-      const msg = res.body.msg
-      expect(msg).toBe("Very Bad Request!")
-    })
+      .patch("/api/reviews/bananas")
+      .send(patchedVotes)
+      .expect(400)
+      .then((res) => {
+        const msg = res.body.msg;
+        expect(msg).toBe("Very Bad Request!");
+      });
   });
   test("status:400 review_id is valid but does not exist", () => {
-    const patchedVotes = {inc_votes: 2};
+    const patchedVotes = { inc_votes: 2 };
     return request(app)
-    .patch("/api/reviews/112")
-    .send(patchedVotes)
-    .expect(404)
-    .then((res)=>{
-      const msg = res.body.msg
-      expect(msg).toBe("Not Found!")
-    })
+      .patch("/api/reviews/112")
+      .send(patchedVotes)
+      .expect(404)
+      .then((res) => {
+        const msg = res.body.msg;
+        expect(msg).toBe("Not Found!");
+      });
+  });
+});
+describe("10. GET /api/reviews (queries)", () => {
+  describe("GET /api/reviews?category=...", () => {
+    test("status:200, responds with an array of review objects of the query category", () => {
+      return request(app)
+        .get("/api/reviews?category=social deduction")
+        .expect(200)
+        .then(({ body }) => {
+          const { reviews } = body;
+          expect(reviews).toHaveLength(11)
+          reviews.forEach((review) => {
+            expect(review.category).toBe('social deduction');
+            expect(review).toEqual(
+              expect.objectContaining({
+                owner: expect.any(String),
+                title: expect.any(String),
+                review_id: expect.any(Number),
+                review_img_url: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                designer: expect.any(String),
+              })
+            );
+          });
+        });
+    });
+    test("status:200, responds with an array of review objects of the query category cont'd", () => {
+      return request(app)
+        .get("/api/reviews?category=dexterity")
+        .expect(200)
+        .then(({ body }) => {
+          const { reviews } = body;
+          reviews.forEach((review) => {
+            expect(review.category).toBe("dexterity");
+            expect(review).toEqual(
+              expect.objectContaining({
+                owner: expect.any(String),
+                title: expect.any(String),
+                review_id: expect.any(Number),
+                review_img_url: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                designer: expect.any(String),
+              })
+            );
+          });
+        });
+    });
+    test("status:400 query category does not exist", () => {
+      return request(app)
+        .get("/api/reviews?category=pop-culture")
+        .expect(400)
+        .then((res) => {
+          const msg = res.body.msg;
+          expect(msg).toBe("Very Bad Request!");
+        });
+    });
+    test("status:400 query category exists but has no reviews", () => {
+      return request(app)
+        .get("/api/reviews?category=children's games")
+        .expect(200)
+        .expect(200)
+        .then(({ body }) => {
+          const { reviews } = body;
+          expect(reviews).toEqual([])
+        })
+    });
+  });
+  describe("GET /api/reviews?sort_by=...", () => {
+    test("status:200 responds with an array of sorted review objects", () => {
+      return request(app)
+        .get("/api/reviews?sort_by=owner")
+        .expect(200)
+        .then(({ body }) => {
+          const { reviews } = body;
+          expect(reviews).toHaveLength(13)
+          expect(reviews).toBeSortedBy("owner", { descending: true });
+          reviews.forEach((review) => {
+            expect(review).toEqual(
+              expect.objectContaining({
+                owner: expect.any(String),
+                title: expect.any(String),
+                review_id: expect.any(Number),
+                review_img_url: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                designer: expect.any(String),
+              })
+            );
+          });
+        });
+    });
+    test("status:200 responds with an array of sorted review objects -default date", () => {
+      return request(app)
+        .get("/api/reviews?sort_by")
+        .expect(200)
+        .then(({ body }) => {
+          const { reviews } = body;
+          expect(reviews).toBeSortedBy("created_at", { descending: true });
+          reviews.forEach((review) => {
+            expect(review).toEqual(
+              expect.objectContaining({
+                owner: expect.any(String),
+                title: expect.any(String),
+                review_id: expect.any(Number),
+                review_img_url: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                designer: expect.any(String),
+              })
+            );
+          });
+        });
+    });
+    test("status:400 query category does not exist", () => {
+      return request(app)
+        .get("/api/reviews?sort_by=pop-culture")
+        .expect(400)
+        .then((res) => {
+          console.log(res.body);
+          const msg = res.body.msg;
+          expect(msg).toBe("Very Bad Request!");
+        });
+    });
+  });
+  describe("GET /api/reviews?category=...&sort_by=...&order=...", () => {
+    test("status:200 3 queries - responds with an array of ordered sorted review objects", () => {
+      return request(app)
+        .get("/api/reviews?category=social deduction&&sort_by=owner&&order=asc")
+        .expect(200)
+        .then(({ body }) => {
+          const { reviews } = body;
+          expect(reviews).toBeSortedBy("owner");
+          reviews.forEach((review) => {
+            expect(review.category).toBe("social deduction");
+            expect(review).toEqual(
+              expect.objectContaining({
+                owner: expect.any(String),
+                title: expect.any(String),
+                review_id: expect.any(Number),
+                review_img_url: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                designer: expect.any(String),
+              })
+            );
+          });
+        });
+    });
+    test("status:200 2 queries - responds with an array of ordered sorted review objects", () => {
+      return request(app)
+        .get("/api/reviews?category=social deduction&&sort_by=votes")
+        .expect(200)
+        .then(({ body }) => {
+          const { reviews } = body;
+          expect(reviews).toBeSortedBy("votes", { descending: true });
+          reviews.forEach((review) => {
+            expect(review.category).toBe("social deduction");
+            expect(review).toEqual(
+              expect.objectContaining({
+                owner: expect.any(String),
+                title: expect.any(String),
+                review_id: expect.any(Number),
+                review_img_url: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                designer: expect.any(String),
+              })
+            );
+          });
+        });
+    });
+    test("status:400 order query is not valid", () => {
+      return request(app)
+        .get("/api/reviews?order=pinapple")
+        .expect(400)
+        .then((res) => {
+          const msg = res.body.msg;
+          expect(msg).toBe("Very Bad Request!");
+        });
+    });
   });
 });
 

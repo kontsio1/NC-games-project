@@ -1,11 +1,5 @@
 const {
-  selectCategories,
-  selectReviews,
-  selectReview,
-  insertComment,
-  selectComments,
-  updateReview,
-  selectUsers
+  selectCategories,selectReview,insertComment,selectComments,updateReview,handleQueries,selectUsers
 } = require("../models/model");
 
 exports.getCategories = (req, res, next) => {
@@ -15,9 +9,13 @@ exports.getCategories = (req, res, next) => {
 };
 
 exports.getReviews = (req, res, next) => {
-  selectReviews().then((reviews) => {
-    res.status(200).send({ reviews });
-  });
+  handleQueries(req)
+    .then((reviews) => {
+      res.status(200).send({ reviews });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 
 exports.getReview = (req, res, next) => {
@@ -26,32 +24,34 @@ exports.getReview = (req, res, next) => {
     .then(([review]) => {
       res.status(200).send({ review });
     })
-        .catch((err) => {
+    .catch((err) => {
       next(err);
     });
 };
 
 exports.getComments = (req, res, next) => {
-  const {review_id} = req.params
-  selectComments(review_id).then((comments)=>{
-    res.status(200).send({comments})
-  })
-  .catch((err)=>{
-    next(err)
-  })
-}
+  const { review_id } = req.params;
+  selectComments(review_id)
+    .then((comments) => {
+      res.status(200).send({ comments });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
 
 exports.postComment = (req, res, next) => {
-  const {review_id} = req.params
-  const author = req.body.username
-  const body = req.body.body
-  insertComment(review_id, author, body).then(([comment]) => {
-    res.status(201).send({comment})
- })
-  .catch((err)=>{
-    next(err)
-  })
-}
+  const { review_id } = req.params;
+  const author = req.body.username;
+  const body = req.body.body;
+  insertComment(review_id, author, body)
+    .then(([comment]) => {
+      res.status(201).send({ comment });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
 
 exports.patchReview = (req, res, next) => {
   const {review_id} = req.params
