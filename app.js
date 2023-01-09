@@ -1,10 +1,9 @@
 const cors = require('cors');
-app.use(cors());
-
 const express = require("express");
 const {handleBadRequestErrors, handleCustomErrors, finalHandleErrors, handleNotFoundErrors, handleWrongPath} = require('./errors/error-handlers')
 const { getCategories, getReviews, getReview, getComments, postComment, patchReview, getUsers, getApi} = require("./controllers/controller");
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 app.get("/api/", getApi)
